@@ -6,10 +6,10 @@ pygame.init()
 width, height = 600, 600
 screen = pygame.display.set_mode((width, height))
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
+noir = (0, 0, 0)
+blanc = (255, 255, 255)
 
-pygame.display.set_caption("Gomoku Game")
+pygame.display.set_caption("Jeu de Gomoku")
 
 running = True
 while running:
