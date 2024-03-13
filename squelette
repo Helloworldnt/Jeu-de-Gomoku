@@ -1,0 +1,28 @@
+import pygame
+import sys
+
+pygame.init()
+
+width, height = 600, 600
+screen = pygame.display.set_mode((width, height))
+
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+
+pygame.display.set_caption("Gomoku Game")
+
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            pass
+
+    screen.fill(WHITE)
+    
+    pygame.draw.line(screen, BLACK, (0, 0), (width, height), 5)
+
+    pygame.display.flip()
+
+pygame.quit()
