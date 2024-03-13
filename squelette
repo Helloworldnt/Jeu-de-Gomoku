@@ -19,9 +19,9 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             pass
 
-    screen.fill(WHITE)
+    screen.fill(blanc)
     
-    pygame.draw.line(screen, BLACK, (0, 0), (width, height), 5)
+    pygame.draw.line(screen, noir, (0, 0), (width, height), 5)
 
     pygame.display.flip()
 
