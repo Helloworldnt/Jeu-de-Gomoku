@@ -1,0 +1,58 @@
+import pygame
+import sys
+
+pygame.init()
+
+largeur, hauteur = 800, 800
+cadrex , cadrey = 100, 100
+cadrex1 , cadrey1 = 700, 700
+lignes, colonnes = 15, 15
+taille_cellule = cadrex1 // cadrey1
+
+noir = (0, 0, 0)
+blanc = (0, 70, 31)
+gris = (200, 200, 200)
+vert = (255,255,255)
+
+ecran = pygame.display.set_mode((largeur, hauteur))
+pygame.display.set_caption("Jeu de Gomoku")
+
+plateau = [[0 for _ in range(colonnes)] for _ in range(lignes)]
+
+joueur_actuel = 1
+
+def dessiner_plateau():
+    ecran.fill(blanc)
+    for x in range(cadrex, largeur, taille_cellule):
+        pygame.draw.line(ecran, gris, (x,cadrey), (x,cadrey ))
+    for y in range(cadrey, hauteur, taille_cellule):
+        pygame.draw.line(ecran, gris, (cadrex, y), (cadrex1, y))
+    for ligne in range(lignes):
+        for colonne in range(colonnes):
+            if plateau[ligne][colonne] != 0:
+                couleur = noir if plateau[ligne][colonne] == 1 else vert
+                pygame.draw.circle(ecran, couleur, ((colonne + 1) * taille_cellule, (ligne + 1) * taille_cellule), taille_cellule // 2 - 5)
+print(taille_cellule)
+def gerer_clic(x, y):
+    global joueur_actuel
+    colonne = x // taille_cellule
+    ligne = y // taille_cellule
+    print(colonne)
+    print(ligne)
+    if plateau[ligne][colonne] == 0:
+        plateau[ligne][colonne] = joueur_actuel
+        joueur_actuel = 1 if joueur_actuel == 2 else 2
+
+en_cours = True
+while en_cours:
+    for evenement in pygame.event.get():
+        if evenement.type == pygame.QUIT:
+            en_cours = False
+        elif evenement.type == pygame.MOUSEBUTTONDOWN:
+            x, y = pygame.mouse.get_pos()
+            gerer_clic(x, y)
+
+    dessiner_plateau()
+    pygame.display.flip()
+
+pygame.quit()
