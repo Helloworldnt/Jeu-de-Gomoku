@@ -1,0 +1,173 @@
+import pygame
+import random
+import sys
+
+pygame.init()
+
+largeur, hauteur = 800, 800
+blanc = (255, 255, 255)
+noir = (0, 0, 0)
+
+ecran = pygame.display.set_mode((largeur, hauteur))
+pygame.display.set_caption("Jeu de Sudoku")
+
+font = pygame.font.SysFont(None, 50)
+pygame.init()
+
+class jeu:
+    def __init__(self):
+        self.largeur = 800
+        self. hauteur = 800
+        self.cadrex = 100
+        self.cadrey = 100
+        self.cadrex1 = 700
+        self.cadrey1 = 700
+        self.lignes = 15
+        self.colonnes = 15
+        self.taille_cellule = 600 // 15
+        self.noir = (0, 0, 0)
+        self.blanc = (127, 127, 127)
+        self.gris = (200, 200, 200)
+        self.vert = (255,255,255)
+        self.joueur_actuel = 1
+
+    def plateau(self, colonnes, lignes):
+        plateau = [[0 for _ in range(colonnes)] for _ in range(lignes)]
+
+    def platea(self, plateau):
+        ecran.fill(blanc)
+        for x in range(cadrex, cadrex1 + 1, taille_cellule):
+            pygame.draw.line(ecran, gris, (x, cadrey), (x, cadrey1))
+        for y in range(cadrey, cadrey1 + 1, taille_cellule):
+            pygame.draw.line(ecran, gris, (cadrex, y), (cadrex1, y))
+        pygame.draw.line(ecran, noir, (cadrex, cadrey1), (cadrex1, cadrey1), 2)
+        pygame.draw.line(ecran, noir, (cadrex1, cadrey), (cadrex1, cadrey1), 2)
+        for ligne in range(lignes):
+            for colonne in range(colonnes):
+                if plateau[ligne][colonne] != 0:
+                    couleur = noir if plateau[ligne][colonne] == 1 else vert
+
+                    x = cadrex + colonne * taille_cellule + taille_cellule // 9-3
+                    y = cadrey + ligne * taille_cellule + taille_cellule // 9-3
+
+                    pygame.draw.circle(ecran, couleur, (x, y), taille_cellule // 4)
+
+    def gerer_clic(self, x, y):
+        global joueur_actuel
+        colonne = (x - cadrex+20) // taille_cellule
+        ligne = (y - cadrey+20) // taille_cellule
+        if plateau[ligne][colonne] == 0:
+            plateau[ligne][colonne] = joueur_actuel
+            if verifier_victoire(ligne, colonne):
+                print("Le joueur", joueur_actuel, "a gagné !")
+                pygame.quit()
+                sys.exit()
+            joueur_actuel = 1 if joueur_actuel == 2 else 2
+
+    def verifier_victoire(ligne, colonne):
+        alignement = 0
+        for j in range(colonnes):
+            if plateau[ligne][j] == joueur_actuel:
+                alignement += 1
+                if alignement == 5:
+                    return True
+            else:
+                alignement = 0
+        alignement = 0
+        for i in range(lignes):
+            if plateau[i][colonne] == joueur_actuel:
+                alignement += 1
+                if alignement == 5:
+                    return True
+            else:
+                alignement = 0
+
+
+        alignement = 0
+        i, j = ligne, colonne
+        while i < lignes and j < colonnes:
+            if plateau[i][j] == joueur_actuel:
+                alignement += 1
+                if alignement == 5:
+                    return True
+            else:
+                alignement = 0
+            i += 1
+            j += 1
+
+        i, j = ligne, colonne
+        while i >= 0 and j >= 0:
+            if plateau[i][j] == joueur_actuel:
+                alignement += 1
+                if alignement == 5:
+                    return True
+            else:
+                alignement = 0
+            i -= 1
+            j -= 1
+
+
+        alignement = 0
+        i, j = ligne, colonne
+        while i >= 0 and j < colonnes:
+            if plateau[i][j] == joueur_actuel:
+                alignement += 1
+                if alignement == 5:
+                    return True
+            else:
+                alignement = 0
+            i -= 1
+            j += 1
+
+        i, j = ligne, colonne
+        while i < lignes and j >= 0:
+            if plateau[i][j] == joueur_actuel:
+                alignement += 1
+                if alignement == 5:
+                    return True
+            else:
+                alignement = 0
+            i += 1
+            j -= 1
+
+        return False
+
+def afficher_texte(texte, x, y, couleur):
+    texte_surface = font.render(texte, True, couleur)
+    texte_rect = texte_surface.get_rect(center=(x, y))
+    ecran.blit(texte_surface, texte_rect)
+
+def bouton(message, x, y, largeur, hauteur, couleur_clair, couleur_fonce, action=None):
+    souris = pygame.mouse.get_pos()
+    clic = pygame.mouse.get_pressed()
+
+    if x < souris[0] < x + largeur and y < souris[1] < y + hauteur:
+        pygame.draw.rect(ecran, couleur_clair, (x, y, largeur, hauteur))
+        if clic[0] == 1 and action != None:
+            action()
+    else:
+        pygame.draw.rect(ecran, couleur_fonce, (x, y, largeur, hauteur))
+
+    afficher_texte(message, x + largeur / 2, y + hauteur / 2, noir)
+
+def quitter_jeu():
+    pygame.quit()
+    sys.exit()
+JEU=jeu()
+
+def joueur_vs_joueur():
+    en_cours = True
+    while en_cours:
+        for evenement in pygame.event.get():
+            if evenement.type == pygame.QUIT:
+                en_cours = False
+            elif evenement.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
+                JEU.react
+                colonne = (x - cadrex) // taille_cellule
+                ligne = (y - cadrey) // taille_cellule
+                print("Colonne:", colonne)
+                print("Ligne:", ligne)
+
+        dessiner_plateau()
+        pygame.display.flip()
