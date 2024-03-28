@@ -1,0 +1,288 @@
+import pygame
+import random
+import sys
+
+class PlateauDeJeu:
+    def __init__(self):
+        self.largeur, self.hauteur = 800, 800
+        self.cadrex, self.cadrey = 100, 100
+        self.cadrex1, self.cadrey1 = 700, 700
+        self.lignes, self.colonnes = 15, 15
+        self.taille_cellule = 600 // 15
+        self.plateau = [[0 for _ in range(self.colonnes)] for _ in range(self.lignes)]
+        self.joueur_actuel = 1
+        self.dernier_coup = None
+        self.historique_coups = []
+        self.historique_joueurs = []
+
+    def afficher_texte(self, texte, x, y, couleur):
+        texte_surface = font.render(texte, True, couleur)
+        texte_rect = texte_surface.get_rect(center=(x, y))
+        ecran.blit(texte_surface, texte_rect)
+
+    def dessiner_plateau(self):
+        ecran.fill(blanc)
+        for x in range(self.cadrex, self.cadrex1, self.taille_cellule):
+            pygame.draw.line(ecran, gris, (x, self.cadrey), (x, self.cadrey1 - self.taille_cellule))
+        for y in range(self.cadrey, self.cadrey1, self.taille_cellule):
+            pygame.draw.line(ecran, gris, (self.cadrex, y), (self.cadrex1 - self.taille_cellule, y))
+
+        for ligne in range(self.lignes):
+            for colonne in range(self.colonnes):
+                if self.plateau[ligne][colonne] != 0:
+                    couleur = noir if self.plateau[ligne][colonne] == 1 else vert
+
+                    x = self.cadrex + colonne * self.taille_cellule + self.taille_cellule // 9 - 3
+                    y = self.cadrey + ligne * self.taille_cellule + self.taille_cellule // 9 - 3
+
+                    pygame.draw.circle(ecran, couleur, (x, y), self.taille_cellule // 4)
+
+    def gerer_clic(self, x, y):
+        colonne = (x - self.cadrex + 20) // self.taille_cellule
+        ligne = (y - self.cadrey + 20) // self.taille_cellule
+        if x >= 100 and y >= 100 and x <= 812 and y <= 812:
+            if self.plateau[int(ligne)][int(colonne)] == 0:
+                self.plateau[int(ligne)][int(colonne)] = self.joueur_actuel
+                self.dernier_coup = (int(ligne), int(colonne))
+                self.historique_coups.append((int(ligne), int(colonne)))
+                self.historique_joueurs.append(self.joueur_actuel)
+                if self.verifier_victoire(int(ligne), int(colonne)):
+                    print("Le joueur", self.joueur_actuel, "a gagné !")
+                    pygame.quit()
+                    sys.exit()
+                self.joueur_actuel = 1 if self.joueur_actuel == 2 else 2
+                if self.joueur_actuel == 2:
+                    self.jouer_bot()
+        else:
+            return None
+
+    def annuler_dernier_coup(self):
+        while self.historique_coups:
+            dernier_joueur = self.historique_joueurs.pop()
+            ligne, colonne = self.historique_coups.pop()
+            self.plateau[ligne][colonne] = 0
+            if dernier_joueur == 1:
+                self.joueur_actuel = 1
+                break
+            elif dernier_joueur == 2:
+                self.joueur_actuel = 2
+            
+    def reinitialiser_plateau(self):
+        self.plateau = [[0 for _ in range(self.colonnes)] for _ in range(self.lignes)]
+        self.joueur_actuel = 1
+        self.dernier_coup = None
+
+    def jouer_partie_a_partir_de_position(self, positions):
+        self.reinitialiser_plateau()
+        for position in positions:
+            ligne, colonne, joueur = position
+            if 0 <= ligne < self.lignes and 0 <= colonne < self.colonnes:
+                self.plateau[ligne][colonne] = joueur
+                self.joueur_actuel = 1 if joueur == 2 else 2
+
+    
+    def match_nul(self):
+        for ligne in self.plateau:
+            if 0 in ligne:
+                return False
+        return True
+    
+    def verifier_victoire(self, ligne, colonne):
+
+        alignement = 0
+        for j in range(self.colonnes):
+            if self.plateau[ligne][j] == self.joueur_actuel:
+                alignement += 1
+                if alignement == 5:
+                    return True
+            else:
+                alignement = 0
+        alignement = 0
+        for i in range(self.lignes):
+            if self.plateau[i][colonne] == self.joueur_actuel:
+                alignement += 1
+                if alignement == 5:
+                    return True
+            else:
+                alignement = 0
+
+        alignement = 0
+        i, j = ligne, colonne
+        while i < self.lignes and j < self.colonnes:
+            if self.plateau[i][j] == self.joueur_actuel:
+                alignement += 1
+                if alignement == 5:
+                    return True
+            else:
+                alignement = 0
+            i += 1
+            j += 1
+
+        i, j = ligne, colonne
+        while i >= 0 and j >= 0:
+            if self.plateau[i][j] == self.joueur_actuel:
+                alignement += 1
+                if alignement == 5:
+                    return True
+            else:
+                alignement = 0
+            i -= 1
+            j -= 1
+
+        alignement = 0
+        i, j = ligne, colonne
+        while i >= 0 and j < self.colonnes:
+            if self.plateau[i][j] == self.joueur_actuel:
+                alignement += 1
+                if alignement == 5:
+                    return True
+            else:
+                alignement = 0
+            i -= 1
+            j += 1
+
+        i, j = ligne, colonne
+        while i < self.lignes and j >= 0:
+            if self.plateau[i][j] == self.joueur_actuel:
+                alignement += 1
+                if alignement == 5:
+                    return True
+            else:
+                alignement = 0
+            i += 1
+            j -= 1
+
+        return False
+
+    def jouer_bot(self):
+        while True:
+            ligne = random.randint(0, self.lignes - 1)
+            colonne = random.randint(0, self.colonnes - 1)
+            if self.plateau[ligne][colonne] == 0:
+                self.plateau[ligne][colonne] = 2
+                break
+
+pygame.init()
+
+blanc = (0, 49, 31)
+noir = (0, 0, 0)
+gris = (200, 200, 200)
+vert = (255, 255, 255)
+
+font = pygame.font.SysFont(None, 50)
+
+largeur, hauteur = 800, 800
+
+ecran = pygame.display.set_mode((largeur, hauteur))
+pygame.display.set_caption("Jeu de Sudoku")
+
+plateau_de_jeu = PlateauDeJeu()
+
+def quitter_jeu():
+    pygame.quit()
+    sys.exit()
+
+def joueur_vs_joueur():
+    plateau_de_jeu = PlateauDeJeu()
+    en_cours = True
+    while en_cours:
+        for evenement in pygame.event.get():
+            if evenement.type == pygame.QUIT:
+                en_cours = False
+            elif evenement.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
+                plateau_de_jeu.gerer_clic(x, y)
+                
+            elif evenement.type == pygame.KEYDOWN:
+                if evenement.key == pygame.K_BACKSPACE:
+                    plateau_de_jeu.annuler_dernier_coup()
+
+        plateau_de_jeu.dessiner_plateau()
+        pygame.display.flip()
+
+def joueur_vs_bot():
+    plateau_de_jeu = PlateauDeJeu()
+    en_cours = True
+    while en_cours:
+        joueur_a_joue = False
+        for evenement in pygame.event.get():
+            if evenement.type == pygame.QUIT:
+                en_cours = False
+            elif evenement.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
+                plateau_de_jeu.gerer_clic(x, y)
+                joueur_a_joue = True
+                
+        if joueur_a_joue:
+            if plateau_de_jeu.dernier_coup is not None:
+                ligne, colonne = plateau_de_jeu.dernier_coup
+                plateau_de_jeu.jouer_bot()
+                plateau_de_jeu.joueur_actuel = 1 if plateau_de_jeu.joueur_actuel == 2 else 2
+
+                if plateau_de_jeu.verifier_victoire(ligne, colonne):
+                    print("Le joueur", plateau_de_jeu.joueur_actuel, "a gagné !")
+                    pygame.quit()
+                    sys.exit()
+
+                if plateau_de_jeu.match_nul():
+                    print("Match nul !")
+                    pygame.quit()
+                    sys.exit()
+            
+        elif not joueur_a_joue:
+            if plateau_de_jeu.joueur_actuel == 2:
+                ligne, colonne = plateau_de_jeu.dernier_coup if plateau_de_jeu.dernier_coup else (None, None)
+                plateau_de_jeu.jouer_bot()
+
+                plateau_de_jeu.joueur_actuel = 1 if plateau_de_jeu.joueur_actuel == 2 else 2
+
+                if plateau_de_jeu.verifier_victoire(ligne, colonne):
+                    print("Le joueur", plateau_de_jeu.joueur_actuel, "a gagné !")
+                    pygame.quit()
+                    sys.exit()
+
+                if plateau_de_jeu.match_nul():
+                    print("Match nul !")
+                    pygame.quit()
+                    sys.exit()
+            
+        plateau_de_jeu.dessiner_plateau()
+        pygame.display.flip()
+        
+def bot_vs_bot():
+    print("Bot vs Bot")
+
+def afficher_menu():
+    en_cours = True
+    while en_cours:
+        for evenement in pygame.event.get():
+            if evenement.type == pygame.QUIT:
+                en_cours = False
+
+        ecran.fill(blanc)
+        plateau_de_jeu.afficher_texte("Choisissez un Mode de Jeu", largeur // 2, 100, noir)
+
+        bouton("Joueur vs Joueur", 150, 300, 500, 100, (0, 255, 0), (0, 200, 0), joueur_vs_joueur)
+        bouton("Joueur vs Bot", 150, 450, 500, 100, (255, 0, 0), (200, 0, 0), joueur_vs_bot)
+        bouton("Bot vs Bot", 150, 600, 500, 100, (0, 0, 255), (0, 0, 200), bot_vs_bot)
+        bouton("Quitter", 150, 750, 500, 100, (255, 255, 0), (200, 200, 0), quitter_jeu)
+
+        pygame.display.update()
+
+    pygame.quit()
+
+def bouton(message, x, y, largeur, hauteur, couleur_clair, couleur_fonce, action=None):
+    souris = pygame.mouse.get_pos()
+    clic = pygame.mouse.get_pressed()
+
+    if x < souris[0] < x + largeur and y < souris[1] < y + hauteur:
+        pygame.draw.rect(ecran, couleur_clair, (x, y, largeur, hauteur))
+        if clic[0] == 1 and action is not None:
+            action()
+    else:
+        pygame.draw.rect(ecran, couleur_fonce, (x, y, largeur, hauteur))
+
+    plateau_de_jeu.afficher_texte(message, x + largeur / 2, y + hauteur / 2, noir)
+
+afficher_menu()
+
