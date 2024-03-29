@@ -227,10 +227,10 @@ def afficher_menu():
         ecran.fill(blanc)
         plateau_de_jeu.afficher_texte("Choisissez un Mode de Jeu", largeur // 2, 100, noir)
 
-        bouton("Joueur vs Joueur", 150, 300, 500, 100, (0, 255, 0), (0, 200, 0), joueur_vs_joueur)
-        bouton("Joueur vs Bot", 150, 450, 500, 100, (255, 0, 0), (200, 0, 0), joueur_vs_bot)
-        bouton("Bot vs Bot", 150, 600, 500, 100, (0, 0, 255), (0, 0, 200), bot_vs_bot)
-        bouton("Quitter", 150, 750, 500, 100, (255, 255, 0), (200, 200, 0), quitter_jeu)
+        bouton("Joueur vs Joueur", 150, 300, 500, 100, (0, 200, 0), (0, 200, 0), joueur_vs_joueur)
+        bouton("Joueur vs Bot", 150, 450, 500, 100, (0, 178, 0), (0, 178, 0), joueur_vs_bot)
+        bouton("Bot vs Bot", 150, 600, 500, 100, (0, 158, 0), (0, 158, 0), bot_vs_bot)
+        bouton("Quitter", 150, 750, 500, 100, (0, 100, 0), (0, 100, 0), quitter_jeu)
 
         pygame.display.update()
 
